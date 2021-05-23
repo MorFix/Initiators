@@ -7,6 +7,11 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import TextField from '@material-ui/core/TextField';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
+import Toolbar from "@material-ui/core/Toolbar";
+import AppBar from "@material-ui/core/AppBar";
+import ArrowForward from "@material-ui/icons/ArrowForward";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
 
 import {getUser} from '../../../../services/user';
 import {log} from '../../../../services/error';
@@ -45,6 +50,14 @@ const FundDialog = ({project, onClose, isWithdrawing, userCoins}) => {
 
     return (
         <Dialog fullScreen open={true} onClose={() => onClose(false)}>
+            <AppBar position="static">
+                <Toolbar variant="dense">
+                    <IconButton color="inherit" onClick={() => onClose(false)}>
+                        <ArrowForward />
+                    </IconButton>
+                </Toolbar>
+            </AppBar>
+
             <DialogTitle>{dialogTitle}</DialogTitle>
             <DialogContent>
                 <DialogContentText>

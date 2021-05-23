@@ -23,7 +23,7 @@ export const login = userName => {
         userModel = createUser(userName);
     }
 
-    return userModel;
+    return User.fromDb(userModel);
 };
 
 export const getSingleUser = userId => {

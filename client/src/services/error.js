@@ -16,4 +16,6 @@ export const log = error => {
 
   const message = error.response && error.response.data && error.response.data.error || error.message;
   ReactDOM.render(React.createElement(Error, {message}), elem);
+
+  return Promise.reject(error);
 };

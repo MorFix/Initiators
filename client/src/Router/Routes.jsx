@@ -2,7 +2,7 @@ import React from 'react';
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 
 import Login from '../components/Login';
-import Coins from '../components/Coins';
+import Shell from '../components/Shell';
 
 const Routes = () => (
     <Router>
@@ -11,7 +11,7 @@ const Routes = () => (
                 <Login />
             </Route>
             <Route path="/">
-                <Coins />
+                <Shell />
             </Route>
         </Switch>
     </Router>
