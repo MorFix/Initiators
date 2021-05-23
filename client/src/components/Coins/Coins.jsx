@@ -1,17 +1,18 @@
-import React, {useState, useEffect, useRef} from 'react';
-import Button from "@material-ui/core/Button";
-import Box from "@material-ui/core/Box";
-import {Redirect, useHistory} from 'react-router-dom';
 import axios from 'axios';
+import React, {useState, useEffect, useRef} from 'react';
+import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
+import {Redirect, useHistory} from 'react-router-dom';
 
 import {log} from '../../services/error';
-import {getUsername, logout} from '../../services/user';
+import {getUser, logout} from '../../services/user';
+import Project from './Project/Project';
 
 const Coins = () => {
     const [loaded, setLoaded] = useState(false);
     const [coins, setCoins] = useState('');
+    const [projects, setProjects] = useState([]);
     const timeoutId = useRef(0);
-    const componentUnmounted = useRef(false);
     const history = useHistory();
 
     const onLogoutClick = () => {
@@ -19,46 +20,60 @@ const Coins = () => {
         history.push('/login');
     };
 
-    const setCoinsFetch = () => {
-        if (!componentUnmounted.current) {
-            timeoutId.current = setTimeout(loadCoins, 3000);
-        }
+    const setDataFetchTimeout = () => {
+        timeoutId.current = setTimeout(loadData, 3000);
     };
 
-    const loadCoins = () => {
-        axios.get('/api/user', {params: {user: getUsername()}})
-            .then(({data: {coins}}) => {
-                setLoaded(true);
-                setCoins(coins);
+    const loadCoins = () => axios.get('/api/user', {params: {userId: getUser().id}})
+        .then(({data: {coins}}) => {
+            setLoaded(true);
+            setCoins(coins);
+        });
+
+    const loadProjects = () => axios.get('/api/projects', {params: {userId: getUser().id}})
+        .then(({data: projects}) => {
+            setProjects(projects);
+        });
+
+    const loadData = () => {
+        const user = getUser();
+        if (!user) {
+            return;
+        }
+
+        Promise.all([loadCoins(), loadProjects()])
+            .then(() => {
+               setLoaded(true);
             })
             .catch(log)
-            .finally(setCoinsFetch);
+            .finally(setDataFetchTimeout);
     };
 
     useEffect(() => {
-        loadCoins();
+        loadData();
 
         return () => {
-            componentUnmounted.current = true;
             clearTimeout(timeoutId.current);
         };
     }, []);
 
-    const username = getUsername();
+    const {name: userName} = getUser();
 
     return (
         <>
-            {!username && <Redirect to="/login" />}
+            {!userName && <Redirect to="/login" />}
             <p>
-                היי, {username}
+                היי, {userName}
             </p>
             {!loaded && <p>
-                טוען את המטבעות שלך...
+                טוען את המידע שלך...
                 {!loaded ? '' : `יש לך ${coins} מטבעות`}
             </p>}
             {loaded && <Box>
                 יש לך <b>{coins}</b> מטבעות
             </Box>}
+
+            {projects.map(x => <Project key={x.id} project={x}/>)}
 
             <p>
                 <Button variant="contained" color="secondary" onClick={onLogoutClick}>יציאה</Button>

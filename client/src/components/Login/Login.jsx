@@ -7,7 +7,7 @@ import axios from 'axios';
 import {Redirect, useHistory} from 'react-router-dom';
 
 import {log} from '../../services/error';
-import {getUsername, setUsername} from "../../services/user";
+import {getUser, setUser} from "../../services/user";
 
 import './Login.css';
 
@@ -24,8 +24,8 @@ const Login = () => {
         setLoading(true);
 
         axios.post('/api/login', {user: name})
-            .then(({data: {name}}) => {
-                setUsername(name);
+            .then(({data: user}) => {
+                setUser(user);
                 history.push('/');
             })
             .catch(log)
@@ -36,7 +36,7 @@ const Login = () => {
 
     return (
         <>
-            {getUsername() && <Redirect to="/" />}
+            {getUser() && <Redirect to="/" />}
             <p>
                 שלום יזם, איך השם?
             </p>
