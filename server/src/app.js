@@ -14,10 +14,16 @@ config();
 
 const app = express();
 
+const clientPath = resolve(__dirname, '..', '..', 'client', 'dist');
+
 app.use(bodyParser.json());
-app.use(express.static(resolve(__dirname, '..', '..', 'client', 'dist')));
+app.use(express.static(clientPath));
 
 app.use('/api', apiRouter);
+
+app.get('*', (req, res) => {
+    res.sendFile(resolve(clientPath, 'index.html'));
+});
 
 app.use((error, req, res, next) => {
     console.log(error);
