@@ -6,11 +6,16 @@ export const getAllProjects = () => Object.values(getProjects() || {})
     .map(Project.fromDb);
 
 export const fundProject = (projectId, user, amount) => {
-    if (user.coins < amount) {
+    if (amount > 0 && user.coins < amount) {
         throw new Error('אין לך מספיק מטבעות בשביל זה');
     }
 
-    const project = Project.fromDb(getProject());
+    const projectDb = getProject(projectId);
+    if (!projectDb) {
+        throw new Error('הפרויקט המבוקש לא נמצא');
+    }
+
+    const project = Project.fromDb(projectDb);
     let fund = project.funds.find(x => x.userId === user.id);
     if (!fund) {
         fund = new Fund(user.id, 0);

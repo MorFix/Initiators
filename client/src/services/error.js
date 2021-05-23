@@ -14,6 +14,6 @@ export const log = error => {
 
   ReactDOM.unmountComponentAtNode(elem);
 
-  const message = error.message;
+  const message = error.response && error.response.data && error.response.data.error || error.message;
   ReactDOM.render(React.createElement(Error, {message}), elem);
 };

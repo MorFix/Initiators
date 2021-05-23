@@ -7,7 +7,7 @@ const Error = ({message}) => {
     const [isOpen, setIsOpen] = useState(true);
 
     return (
-        <Snackbar open={isOpen} autoHideDuration={3000}>
+        <Snackbar open={isOpen} autoHideDuration={3000} onClose={() => setIsOpen(false)}>
             <Alert variant="filled" severity="error" onClose={() => setIsOpen(false)}>
                 <AlertTitle>שגיאה</AlertTitle>
                 {message}

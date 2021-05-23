@@ -4,7 +4,7 @@ import JSONdb from 'simple-json-db';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const db = new JSONdb(resolve(__dirname, '..', '..', 'db.json'));
+const db = new JSONdb(resolve(__dirname, '..', '..', '..', 'db.json'));
 
 const USERS_KEY = 'users';
 const PROJECTS_KEY = 'projects';

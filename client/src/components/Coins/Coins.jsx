@@ -1,18 +1,25 @@
 import axios from 'axios';
 import React, {useState, useEffect, useRef} from 'react';
 import Button from '@material-ui/core/Button';
-import Box from '@material-ui/core/Box';
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
 import {Redirect, useHistory} from 'react-router-dom';
 
 import {log} from '../../services/error';
-import {getUser, logout} from '../../services/user';
+import {getUser, logout, setUser} from '../../services/user';
 import Project from './Project/Project';
 
+import './Coins.css';
+
 const Coins = () => {
+    const user = getUser();
+
     const [loaded, setLoaded] = useState(false);
-    const [coins, setCoins] = useState('');
+    const [coins, setCoins] = useState(0);
     const [projects, setProjects] = useState([]);
     const timeoutId = useRef(0);
+    const cancelTokenSource = useRef(null);
     const history = useHistory();
 
     const onLogoutClick = () => {
@@ -21,29 +28,30 @@ const Coins = () => {
     };
 
     const setDataFetchTimeout = () => {
-        timeoutId.current = setTimeout(loadData, 3000);
+        timeoutId.current = setTimeout(loadData, 1500);
     };
 
-    const loadCoins = () => axios.get('/api/user', {params: {userId: getUser().id}})
+    const loadCoins = () => axios.get('/api/user', {params: {userId: user.id}}, {cancelToken: cancelTokenSource.current.token})
         .then(({data: {coins}}) => {
-            setLoaded(true);
             setCoins(coins);
+            setLoaded(true);
         });
 
-    const loadProjects = () => axios.get('/api/projects', {params: {userId: getUser().id}})
+    const loadProjects = () => axios.get('/api/projects', {params: {userId: user.id}}, {cancelToken: cancelTokenSource.current.token})
         .then(({data: projects}) => {
             setProjects(projects);
         });
 
     const loadData = () => {
-        const user = getUser();
         if (!user) {
             return;
         }
 
+        cancelTokenSource.current = axios.CancelToken.source();
+
         Promise.all([loadCoins(), loadProjects()])
             .then(() => {
-               setLoaded(true);
+                setLoaded(true);
             })
             .catch(log)
             .finally(setDataFetchTimeout);
@@ -54,29 +62,36 @@ const Coins = () => {
 
         return () => {
             clearTimeout(timeoutId.current);
+
+            if (cancelTokenSource.current) {
+                cancelTokenSource.current.cancel();
+            }
         };
     }, []);
 
-    const {name: userName} = getUser();
-
     return (
         <>
-            {!userName && <Redirect to="/login" />}
-            <p>
-                היי, {userName}
-            </p>
-            {!loaded && <p>
-                טוען את המידע שלך...
-                {!loaded ? '' : `יש לך ${coins} מטבעות`}
-            </p>}
-            {loaded && <Box>
+            {!user && <Redirect to="/login"/>}
+
+            <AppBar position="static">
+                <Toolbar variant="dense" className="main-toolbar">
+                    <Typography variant="h6" color="inherit" className="toolbar-text">
+                        היי, {user && user.name}
+                    </Typography>
+
+                    <Button edge="end" variant="contained" color="secondary" onClick={onLogoutClick}>יציאה</Button>
+                </Toolbar>
+            </AppBar>
+
+            {!loaded && <p>טוען את המידע שלך...</p>}
+            {loaded && <p>
                 יש לך <b>{coins}</b> מטבעות
-            </Box>}
+            </p>}
 
-            {projects.map(x => <Project key={x.id} project={x}/>)}
+            {projects.map(x => <Project key={x.id} project={x} userCoins={coins}/>)}
 
             <p>
-                <Button variant="contained" color="secondary" onClick={onLogoutClick}>יציאה</Button>
+
             </p>
         </>
     );

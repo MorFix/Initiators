@@ -5,15 +5,27 @@ import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import MoneyOffIcon from '@material-ui/icons/MoneyOff';
+import Alert from '@material-ui/lab/Alert';
+import Snackbar from '@material-ui/core/Snackbar';
 
 import {getUser} from '../../../services/user';
-import FundDialog from "./FundDialog";
+import FundDialog from './FundDialog';
 
-const user = getUser();
+const Project = ({project, userCoins}) => {
+    const user = getUser();
 
-const Project= ({project}) => {
     const [isFunding, setIsFunding] = useState(false);
     const [isWithdrawing, setIsWithdrawing] = useState(false);
+    const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
+    const onSnackbarClose = () => {
+        setIsSnackbarOpen(false);
+    };
+
+    const onFundDialogClose = isSuccess => {
+        setIsFunding(false);
+        setIsSnackbarOpen(isSuccess);
+    };
 
     const currentFund = project.funds.find(x => x.userId === user.id);
 
@@ -23,7 +35,12 @@ const Project= ({project}) => {
     };
 
     return (<Box m={2}>
-        <FundDialog project={project} isWithdrawing={isWithdrawing} isOpen={isFunding} onClose={() => setIsFunding(false)} />
+        {isFunding && <FundDialog project={project} userCoins={userCoins} isWithdrawing={isWithdrawing} onClose={onFundDialogClose} />}
+        <Snackbar open={isSnackbarOpen} autoHideDuration={3000} onClose={onSnackbarClose}>
+            <Alert onClose={onSnackbarClose} severity="success">
+                הפעולה בוצעה בהצלחה
+            </Alert>
+        </Snackbar>
 
         <IconButton style={{ color: red[500] }} onClick={() => fundProject(true)}>
             <MoneyOffIcon />
@@ -35,7 +52,7 @@ const Project= ({project}) => {
             <MonetizationOnIcon />
         </IconButton>
 
-        {currentFund && `(${currentFund.amount})`}
+        {(currentFund && currentFund.amount) ? `(${currentFund.amount})` : ''}
     </Box>);
 };
 

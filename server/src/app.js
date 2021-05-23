@@ -19,13 +19,10 @@ app.use(express.static(resolve(__dirname, '..', '..', 'client', 'dist')));
 
 app.use('/api', apiRouter);
 
-app.use((req, res, next) => {
-    try {
-        next();
-    } catch (err) {
-        res.status(err.status || 500)
-            .json({error: err.message});
-    }
+app.use((error, req, res, next) => {
+    console.log(error);
+
+    res.status(error.status || 500).json({error: error.message});
 });
 
 const PORT = process.env.PORT || 8080;
