@@ -21,6 +21,12 @@ const Login = () => {
     };
 
     const onButtonClick = () => {
+        if (!name)  {
+            log(new Error('חובה להזין שם'));
+
+            return;
+        }
+
         setLoading(true);
 
         axios.post('/api/login', {user: name})

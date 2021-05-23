@@ -11,6 +11,7 @@ import {getUser, logout, setUser} from '../../services/user';
 import Project from './Project/Project';
 
 import './Coins.css';
+import Box from "@material-ui/core/Box";
 
 const Coins = () => {
     const user = getUser();
@@ -73,7 +74,7 @@ const Coins = () => {
         <>
             {!user && <Redirect to="/login"/>}
 
-            <AppBar position="static">
+            <AppBar position="fixed">
                 <Toolbar variant="dense" className="main-toolbar">
                     <Typography variant="h6" color="inherit" className="toolbar-text">
                         היי, {user && user.name}
@@ -83,16 +84,14 @@ const Coins = () => {
                 </Toolbar>
             </AppBar>
 
-            {!loaded && <p>טוען את המידע שלך...</p>}
-            {loaded && <p>
-                יש לך <b>{coins}</b> מטבעות
-            </p>}
+            <Box mt={8}>
+                {!loaded && <span>טוען את המידע שלך...</span>}
+                {loaded && <span>
+                    יש לך <b>{coins}</b> מטבעות
+                </span>}
+            </Box>
 
             {projects.map(x => <Project key={x.id} project={x} userCoins={coins}/>)}
-
-            <p>
-
-            </p>
         </>
     );
 };

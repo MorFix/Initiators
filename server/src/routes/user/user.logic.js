@@ -12,6 +12,10 @@ const createUser = userName => {
 };
 
 export const login = userName => {
+    if (!userName) {
+        throw new Error('חובה להזין שם');
+    }
+
     let userModel = Object.values(getUsers() || {})
         .find(x => x.name === userName);
 
